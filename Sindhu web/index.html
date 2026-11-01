@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sindhu Restaurant — Billing & Menu</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar no-print">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">S</div>
+        <div>
+          <div class="brand-title">Sindhu Restaurant</div>
+          <div class="brand-subtitle">Menu • Cart • Billing • Reports</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="nav-link" href="#/pos" data-route="pos">POS</a>
+        <a class="nav-link" href="#/manage-menu" data-route="manage-menu">Manage Menu</a>
+        <a class="nav-link" href="#/reports" data-route="reports">Monthly Report</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <!-- POS -->
+      <section id="view-pos" class="view">
+        <div class="grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>Menu</h2>
+              <div class="search">
+                <input id="menuSearch" type="search" placeholder="Search menu… (idly, dosai…)" />
+              </div>
+            </div>
+            <div id="menuList" class="menu-list"></div>
+          </div>
+
+          <div class="card bill-card">
+            <div class="card-header">
+              <h2>Cart & Bill</h2>
+              <div class="pill" id="cartCountPill">0 items</div>
+            </div>
+
+            <div id="cartEmpty" class="empty">
+              Click a menu item to add it to the cart.
+            </div>
+
+            <div id="cartTableWrap" class="table-wrap hidden">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th class="right">Qty</th>
+                    <th class="right">Price</th>
+                    <th class="right">Amount</th>
+                    <th class="right no-print">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="cartTbody"></tbody>
+              </table>
+            </div>
+
+            <div class="bill-summary">
+              <div class="row">
+                <span>Subtotal</span>
+                <strong id="subtotalText">₹0.00</strong>
+              </div>
+              <div class="row">
+                <span>Tax (optional)</span>
+                <div class="inline">
+                  <input id="taxPct" type="number" min="0" max="28" step="0.5" value="0" />
+                  <span class="muted">%</span>
+                </div>
+              </div>
+              <div class="row total">
+                <span>Total</span>
+                <strong id="totalText">₹0.00</strong>
+              </div>
+            </div>
+
+            <div class="actions no-print">
+              <button class="btn ghost" id="clearCartBtn">Clear cart</button>
+              <button class="btn" id="printBillBtn">Print bill</button>
+              <button class="btn primary" id="payNowBtn">Pay now (QR)</button>
+            </div>
+
+            <div id="payPanel" class="pay-panel hidden no-print">
+              <div class="pay-header">
+                <div>
+                  <div class="pay-title">Scan & Pay</div>
+                  <div class="muted">Uses a UPI link (editable below).</div>
+                </div>
+                <button class="icon-btn" id="closePayPanelBtn" aria-label="Close">✕</button>
+              </div>
+
+              <label class="label" for="upiInput">UPI ID (example: yourname@okaxis)</label>
+              <input id="upiInput" type="text" placeholder="yourname@bank" />
+
+              <div class="pay-grid">
+                <div class="qr-wrap">
+                  <img id="qrImg" alt="QR code for payment" />
+                </div>
+                <div class="pay-meta">
+                  <div class="row">
+                    <span>Amount</span>
+                    <strong id="payAmountText">₹0.00</strong>
+                  </div>
+                  <div class="row">
+                    <span>UPI Link</span>
+                    <button class="btn small" id="copyUpiLinkBtn">Copy</button>
+                  </div>
+                  <textarea id="upiLinkText" rows="4" readonly></textarea>
+                  <div class="muted small">
+                    Tip: After payment, click “Complete order” to save sales for monthly report.
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="btn" id="completeOrderBtn">Complete order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Manage Menu -->
+      <section id="view-manage-menu" class="view hidden">
+        <div class="card">
+          <div class="card-header">
+            <h2>Manage Menu (CRUD)</h2>
+            <div class="muted">Add / edit / delete menu items. Saved in your browser.</div>
+          </div>
+
+          <form id="menuForm" class="form">
+            <input type="hidden" id="menuId" />
+            <div class="form-grid">
+              <div>
+                <label class="label" for="menuName">Name</label>
+                <input id="menuName" type="text" placeholder="Idly" required />
+              </div>
+              <div>
+                <label class="label" for="menuPrice">Price (₹)</label>
+                <input id="menuPrice" type="number" min="0" step="1" placeholder="20" required />
+              </div>
+              <div>
+                <label class="label" for="menuCategory">Category</label>
+                <input id="menuCategory" type="text" placeholder="Breakfast" />
+              </div>
+              <div>
+                <label class="label" for="menuImage">Image URL</label>
+                <input id="menuImage" type="url" placeholder="https://…" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" type="submit" id="saveMenuBtn">Save item</button>
+              <button class="btn ghost" type="button" id="resetMenuFormBtn">Reset</button>
+              <button class="btn danger" type="button" id="resetToDefaultMenuBtn">Reset menu to default</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Current Menu</h2>
+            <div class="search">
+              <input id="adminSearch" type="search" placeholder="Search menu…" />
+            </div>
+          </div>
+          <div id="adminMenuList" class="admin-list"></div>
+        </div>
+      </section>
+
+      <!-- Reports -->
+      <section id="view-reports" class="view hidden">
+        <div class="card">
+          <div class="card-header">
+            <h2>Monthly Sales Report</h2>
+            <div class="inline">
+              <label class="label" for="reportMonth">Month</label>
+              <input id="reportMonth" type="month" />
+            </div>
+          </div>
+
+          <div class="report-grid">
+            <div class="stat">
+              <div class="muted">Orders</div>
+              <div class="stat-value" id="reportOrders">0</div>
+            </div>
+            <div class="stat">
+              <div class="muted">Items sold</div>
+              <div class="stat-value" id="reportItems">0</div>
+            </div>
+            <div class="stat">
+              <div class="muted">Total revenue</div>
+              <div class="stat-value" id="reportRevenue">₹0.00</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Order ID</th>
+                  <th class="right">Items</th>
+                  <th class="right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTbody"></tbody>
+            </table>
+          </div>
+
+          <div class="actions no-print">
+            <button class="btn ghost" id="exportCsvBtn">Export CSV</button>
+            <button class="btn danger" id="clearOrdersBtn">Clear all orders</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer no-print">
+      <div class="muted small">
+        Data is saved in your browser (localStorage). If you clear browser data, menu & reports will reset.
+      </div>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
